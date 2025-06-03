@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 04</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #userList {
+            width: 200px;
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 20px;
+        }
+        #userList>li {
+            list-style: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+        #userList>li:hover {
+            background-color: orange;
+        }
+        #userList li.selected {
+            background-color: lightcoral;
+        }
+        #output {
+            display: inline-block;
+            border: 1px solid gray;
+            padding: 10px;
+            vertical-align: top;
+            margin-top: 20px;
+            width: 300px;
+            min-height: 180px;
+        }
+        .form-group {
+            margin-bottom: 4px;
+        }
+        .form-group label {
+            width: 85px;
+            display: inline-block;
+        }
+        .form-group input {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <ul id="userList"></ul>
+
+    <form id="output">
+        <div class="form-group">
+            <label for="firstName">Имя</label>
+            <input type="text" name="firstName" id="firstName" required>
+        </div>
+        <div class="form-group">
+            <label for="lastName">Фамилия</label>
+            <input type="text" name="lastName" id="lastName" required>
+        </div>
+        <div class="form-group">
+            <label for="companyName">Компания</label>
+            <input type="text" name="companyName" id="companyName" required>
+        </div>
+        <div class="form-group">
+            <label for="balance">Баланс</label>
+            <input type="number" name="balance" id="balance" required min="1000">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+        <div class="form-group">
+            <label for="age">Возраст</label>
+            <input type="number" name="age" id="age" required min="18">
+        </div>
+        <input type="submit" value="Save" id="saveButton">
+        <input type="reset" value="Reset">
+        <input type="button" value="Delete" id="deleteButton">
+    </form>
+    <script>
+        const STORAGE_KEY = 'users';
+        let users = [
+            {
+                balance: '1250.89',
+                age: 24,
+                name: { first: 'Golden', last: 'Clements' },
+                company: 'EWAVES',
+                email: 'golden.clements@ewaves.io'
+            },
+            {
+                balance: '3637.94',
+                age: 23,
+                name: { first: 'Francis', last: 'Hebert' },
+                company: 'XPLOR',
+                email: 'francis.hebert@xplor.biz'
+            },
+            {
+                balance: '1106.44',
+                age: 31,
+                name: { first: 'Hale', last: 'Cross' },
+                company: 'EARTHPURE',
+                email: 'hale.cross@earthpure.us'
+            },
+            {
+                balance: '2502.43',
+                age: 25,
+                name: { first: 'Delores', last: 'Sykes' },
+                company: 'ASSITIA',
+                email: 'delores.sykes@assitia.com'
+            },
+            {
+                balance: '3651.54',
+                age: 21,
+                name: { first: 'Ryan', last: 'Bolton' },
+                company: 'MOLTONIC',
+                email: 'ryan.bolton@moltonic.biz'
+            },
+            {
+                balance: '1345.79',
+                age: 21,
+                name: { first: 'Carey', last: 'Schwartz' },
+                company: 'UXMOX',
+                email: 'carey.schwartz@uxmox.info'
+            },
+            {
+                balance: '3261.11',
+                age: 30,
+                name: { first: 'Trevino', last: 'Mullins' },
+                company: 'TERRASYS',
+                email: 'trevino.mullins@terrasys.org'
+            },
+            {
+                balance: '1659.17',
+                age: 20,
+                name: { first: 'Gilliam', last: 'Mendez' },
+                company: 'ZENTHALL',
+                email: 'gilliam.mendez@zenthall.tv'
+            },
+            {
+                balance: '2340.54',
+                age: 32,
+                name: { first: 'Brewer', last: 'Vargas' },
+                company: 'QIMONK',
+                email: 'brewer.vargas@qimonk.co.uk'
+            },
+            {
+                balance: '1736.91',
+                age: 24,
+                name: { first: 'Newman', last: 'Wynn' },
+                company: 'VISALIA',
+                email: 'newman.wynn@visalia.name'
+            }
+        ];
+
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            users = JSON.parse(stored);
+        }
+
+        class ListService {
+            constructor(data, listElement, displayFn) {
+                this.data = data;
+                this.listElement = listElement;
+                this.displayFn = displayFn;
+                this.selectedIndex = null;
+                this.render();
+            }
+
+            render() {
+                this.listElement.innerHTML = '';
+                for (let i = 0; i < this.data.length; i++) {
+                    const user = this.data[i];
+                    const li = document.createElement('li');
+                    li.textContent = this.displayFn(user);
+                    li.id = 'u' + i;
+                    if (this.selectedIndex === i) {
+                        li.classList.add('selected');
+                    }
+                    this.listElement.append(li);
+                }
+            }
+
+            select(index) {
+                this.selectedIndex = index;
+                this.selectedData = this.data[index];
+                this.render();
+            }
+
+            deleteSelectedItem() {
+                if (this.selectedIndex === null) return;
+                this.data.splice(this.selectedIndex, 1);
+                this.selectedIndex = null;
+                this.selectedData = null;
+                this.render();
+            }
+        }
+
+        class UserFormService {
+            constructor(form) {
+                this.form = form;
+            }
+
+            fillForm(user) {
+                this.currentUser = user;
+                this.form.firstName.value = user.name.first;
+                this.form.lastName.value = user.name.last;
+                this.form.companyName.value = user.company;
+                this.form.balance.value = user.balance;
+                this.form.email.value = user.email;
+                this.form.age.value = user.age;
+            }
+
+            saveForm() {
+                this.currentUser.name.first = this.form.firstName.value;
+                this.currentUser.name.last = this.form.lastName.value;
+                this.currentUser.company = this.form.companyName.value;
+                this.currentUser.balance = this.form.balance.value;
+                this.currentUser.email = this.form.email.value;
+                this.currentUser.age = this.form.age.value;
+            }
+
+            resetForm() {
+                this.form.reset();
+                this.currentUser = null;
+            }
+        }
+
+        const ul = document.getElementById('userList');
+        const form = document.getElementById('output');
+        const deleteBtn = document.getElementById('deleteButton');
+        const listService = new ListService(users, ul, u => u.name.first + ' ' + u.name.last);
+        const formService = new UserFormService(form);
+
+        ul.addEventListener('click', e => {
+            if (e.target.tagName !== 'LI') return;
+            const idx = Number(e.target.id.slice(1));
+            listService.select(idx);
+            formService.fillForm(listService.selectedData);
+        });
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            formService.saveForm();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+            listService.render();
+        });
+
+        deleteBtn.addEventListener('click', () => {
+            listService.deleteSelectedItem();
+            formService.resetForm();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+        });
+    </script>
+</body>
+</html>
