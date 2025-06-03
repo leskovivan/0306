@@ -14,13 +14,14 @@
             display: inline-block;
             vertical-align: top;
             margin-right: 20px;
+            padding: 0;
         }
-        #userList>li {
+        #userList li {
             list-style: none;
             cursor: pointer;
             padding: 4px;
         }
-        #userList>li:hover {
+        #userList li:hover {
             background-color: orange;
         }
         #userList li.selected {
@@ -82,76 +83,16 @@
     <script>
         const STORAGE_KEY = 'users';
         let users = [
-            {
-                balance: '1250.89',
-                age: 24,
-                name: { first: 'Golden', last: 'Clements' },
-                company: 'EWAVES',
-                email: 'golden.clements@ewaves.io'
-            },
-            {
-                balance: '3637.94',
-                age: 23,
-                name: { first: 'Francis', last: 'Hebert' },
-                company: 'XPLOR',
-                email: 'francis.hebert@xplor.biz'
-            },
-            {
-                balance: '1106.44',
-                age: 31,
-                name: { first: 'Hale', last: 'Cross' },
-                company: 'EARTHPURE',
-                email: 'hale.cross@earthpure.us'
-            },
-            {
-                balance: '2502.43',
-                age: 25,
-                name: { first: 'Delores', last: 'Sykes' },
-                company: 'ASSITIA',
-                email: 'delores.sykes@assitia.com'
-            },
-            {
-                balance: '3651.54',
-                age: 21,
-                name: { first: 'Ryan', last: 'Bolton' },
-                company: 'MOLTONIC',
-                email: 'ryan.bolton@moltonic.biz'
-            },
-            {
-                balance: '1345.79',
-                age: 21,
-                name: { first: 'Carey', last: 'Schwartz' },
-                company: 'UXMOX',
-                email: 'carey.schwartz@uxmox.info'
-            },
-            {
-                balance: '3261.11',
-                age: 30,
-                name: { first: 'Trevino', last: 'Mullins' },
-                company: 'TERRASYS',
-                email: 'trevino.mullins@terrasys.org'
-            },
-            {
-                balance: '1659.17',
-                age: 20,
-                name: { first: 'Gilliam', last: 'Mendez' },
-                company: 'ZENTHALL',
-                email: 'gilliam.mendez@zenthall.tv'
-            },
-            {
-                balance: '2340.54',
-                age: 32,
-                name: { first: 'Brewer', last: 'Vargas' },
-                company: 'QIMONK',
-                email: 'brewer.vargas@qimonk.co.uk'
-            },
-            {
-                balance: '1736.91',
-                age: 24,
-                name: { first: 'Newman', last: 'Wynn' },
-                company: 'VISALIA',
-                email: 'newman.wynn@visalia.name'
-            }
+            { balance: '1250.89', age: 24, name: { first: 'Golden', last: 'Clements' }, company: 'EWAVES', email: 'golden.clements@ewaves.io' },
+            { balance: '3637.94', age: 23, name: { first: 'Francis', last: 'Hebert' }, company: 'XPLOR', email: 'francis.hebert@xplor.biz' },
+            { balance: '1106.44', age: 31, name: { first: 'Hale', last: 'Cross' }, company: 'EARTHPURE', email: 'hale.cross@earthpure.us' },
+            { balance: '2502.43', age: 25, name: { first: 'Delores', last: 'Sykes' }, company: 'ASSITIA', email: 'delores.sykes@assitia.com' },
+            { balance: '3651.54', age: 21, name: { first: 'Ryan', last: 'Bolton' }, company: 'MOLTONIC', email: 'ryan.bolton@moltonic.biz' },
+            { balance: '1345.79', age: 21, name: { first: 'Carey', last: 'Schwartz' }, company: 'UXMOX', email: 'carey.schwartz@uxmox.info' },
+            { balance: '3261.11', age: 30, name: { first: 'Trevino', last: 'Mullins' }, company: 'TERRASYS', email: 'trevino.mullins@terrasys.org' },
+            { balance: '1659.17', age: 20, name: { first: 'Gilliam', last: 'Mendez' }, company: 'ZENTHALL', email: 'gilliam.mendez@zenthall.tv' },
+            { balance: '2340.54', age: 32, name: { first: 'Brewer', last: 'Vargas' }, company: 'QIMONK', email: 'brewer.vargas@qimonk.co.uk' },
+            { balance: '1736.91', age: 24, name: { first: 'Newman', last: 'Wynn' }, company: 'VISALIA', email: 'newman.wynn@visalia.name' }
         ];
 
         const stored = localStorage.getItem(STORAGE_KEY);
@@ -159,98 +100,76 @@
             users = JSON.parse(stored);
         }
 
-        class ListService {
-            constructor(data, listElement, displayFn) {
-                this.data = data;
-                this.listElement = listElement;
-                this.displayFn = displayFn;
-                this.selectedIndex = null;
-                this.render();
-            }
-
-            render() {
-                this.listElement.innerHTML = '';
-                for (let i = 0; i < this.data.length; i++) {
-                    const user = this.data[i];
-                    const li = document.createElement('li');
-                    li.textContent = this.displayFn(user);
-                    li.id = 'u' + i;
-                    if (this.selectedIndex === i) {
-                        li.classList.add('selected');
-                    }
-                    this.listElement.append(li);
-                }
-            }
-
-            select(index) {
-                this.selectedIndex = index;
-                this.selectedData = this.data[index];
-                this.render();
-            }
-
-            deleteSelectedItem() {
-                if (this.selectedIndex === null) return;
-                this.data.splice(this.selectedIndex, 1);
-                this.selectedIndex = null;
-                this.selectedData = null;
-                this.render();
-            }
-        }
-
-        class UserFormService {
-            constructor(form) {
-                this.form = form;
-            }
-
-            fillForm(user) {
-                this.currentUser = user;
-                this.form.firstName.value = user.name.first;
-                this.form.lastName.value = user.name.last;
-                this.form.companyName.value = user.company;
-                this.form.balance.value = user.balance;
-                this.form.email.value = user.email;
-                this.form.age.value = user.age;
-            }
-
-            saveForm() {
-                this.currentUser.name.first = this.form.firstName.value;
-                this.currentUser.name.last = this.form.lastName.value;
-                this.currentUser.company = this.form.companyName.value;
-                this.currentUser.balance = this.form.balance.value;
-                this.currentUser.email = this.form.email.value;
-                this.currentUser.age = this.form.age.value;
-            }
-
-            resetForm() {
-                this.form.reset();
-                this.currentUser = null;
-            }
-        }
-
-        const ul = document.getElementById('userList');
-        const form = document.getElementById('output');
+        const listEl = document.getElementById('userList');
+        const formEl = document.getElementById('output');
+        const firstNameInput = formEl.firstName;
+        const lastNameInput = formEl.lastName;
+        const companyInput = formEl.companyName;
+        const balanceInput = formEl.balance;
+        const emailInput = formEl.email;
+        const ageInput = formEl.age;
         const deleteBtn = document.getElementById('deleteButton');
-        const listService = new ListService(users, ul, u => u.name.first + ' ' + u.name.last);
-        const formService = new UserFormService(form);
+        let selectedIndex = null;
 
-        ul.addEventListener('click', e => {
+        for (let i = 0; i < users.length; i++) {
+            const li = document.createElement('li');
+            li.id = 'u' + i;
+            li.textContent = users[i].name.first + ' ' + users[i].name.last;
+            listEl.append(li);
+        }
+
+        listEl.addEventListener('click', e => {
             if (e.target.tagName !== 'LI') return;
+            if (selectedIndex !== null) {
+                const prev = document.getElementById('u' + selectedIndex);
+                if (prev) prev.classList.remove('selected');
+            }
             const idx = Number(e.target.id.slice(1));
-            listService.select(idx);
-            formService.fillForm(listService.selectedData);
+            selectedIndex = idx;
+            e.target.classList.add('selected');
+            const user = users[idx];
+            firstNameInput.value = user.name.first;
+            lastNameInput.value = user.name.last;
+            companyInput.value = user.company;
+            balanceInput.value = user.balance;
+            emailInput.value = user.email;
+            ageInput.value = user.age;
         });
 
-        form.addEventListener('submit', e => {
+        formEl.addEventListener('submit', e => {
             e.preventDefault();
-            formService.saveForm();
+            if (selectedIndex === null) return;
+            const user = users[selectedIndex];
+            user.name.first = firstNameInput.value;
+            user.name.last = lastNameInput.value;
+            user.company = companyInput.value;
+            user.balance = balanceInput.value;
+            user.email = emailInput.value;
+            user.age = ageInput.value;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-            listService.render();
+            const li = document.getElementById('u' + selectedIndex);
+            if (li) {
+                li.textContent = user.name.first + ' ' + user.name.last;
+            }
         });
 
         deleteBtn.addEventListener('click', () => {
-            listService.deleteSelectedItem();
-            formService.resetForm();
+            if (selectedIndex === null) return;
+            const liToDelete = document.getElementById('u' + selectedIndex);
+            if (liToDelete) listEl.removeChild(liToDelete);
+            for (let j = selectedIndex; j < users.length - 1; j++) {
+                users[j] = users[j + 1];
+            }
+            users.pop();
             localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+            const items = listEl.querySelectorAll('li');
+            for (let k = 0; k < items.length; k++) {
+                items[k].id = 'u' + k;
+                items[k].textContent = users[k].name.first + ' ' + users[k].name.last;
+                items[k].classList.remove('selected');
+            }
+            selectedIndex = null;
+            formEl.reset();
         });
     </script>
 </body>
